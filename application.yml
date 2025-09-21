@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGO_DATABASE}
+      host: localhost
+      auto-index-creation: true
