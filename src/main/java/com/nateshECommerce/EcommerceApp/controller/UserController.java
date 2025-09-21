@@ -1,11 +1,14 @@
 package com.nateshECommerce.EcommerceApp.controller;
 
+import com.nateshECommerce.EcommerceApp.entity.Order;
 import com.nateshECommerce.EcommerceApp.entity.User;
+import com.nateshECommerce.EcommerceApp.service.OrderService;
 import com.nateshECommerce.EcommerceApp.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +20,8 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    OrderService orderService;
 
 
     @PostMapping
@@ -82,4 +87,21 @@ public class UserController {
         }
     }
 
+    @PostMapping("/email/{userMail}/{productName}")
+    public ResponseEntity<?> addOrderToUser(@PathVariable String productName, @PathVariable String userMail) {
+        try {
+            boolean isSaved = orderService.saveOrderToUser(productName, userMail);
+            if (!isSaved) {
+                log.warn("Unable to create order: either user not found or quantity unavailable");
+                return new ResponseEntity<>("Order could not be created.", HttpStatus.BAD_REQUEST);
+            }
+
+            log.info("Order created successfully");
+            return new ResponseEntity<>(productName, HttpStatus.OK);
+
+        } catch (Exception e) {
+            log.error("Unable to create the order", e);
+            return new ResponseEntity<>("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

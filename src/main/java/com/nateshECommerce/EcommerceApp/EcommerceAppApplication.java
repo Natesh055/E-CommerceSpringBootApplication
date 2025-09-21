@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class EcommerceAppApplication {
 
 	public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.load();
-        System.setProperty("spring.data.mongodb.uri", dotenv.get("MONGODB_URI"));
-        System.setProperty("spring.data.mongodb.database", dotenv.get("MONGO_DATABASE"));
+//        Dotenv dotenv = Dotenv.load();
+//        System.setProperty("spring.data.mongodb.uri", dotenv.get("MONGODB_URI"));
+//        System.setProperty("spring.data.mongodb.database", dotenv.get("MONGO_DATABASE"));
 		SpringApplication.run(EcommerceAppApplication.class, args);
 	}
 

@@ -42,6 +42,24 @@ public class AdminController {
         }
     }
 
+    @GetMapping("/all-items")
+    public ResponseEntity<?> getAllItems()
+    {
+        try {
+            List<Order> allItems =  orderService.getAllOrders();
+            if(allItems == null || allItems.isEmpty())
+            {
+                log.error("Unable to find items in the database" );
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            log.info("Entries found for items");
+            return new ResponseEntity<>(allItems,HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Unable to establish connection with database");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/add-order")
     public ResponseEntity<?> addOrder(@RequestBody Order newOrder){
         try{
@@ -56,8 +74,14 @@ public class AdminController {
     @PutMapping("/update-order/{productName}")
     public ResponseEntity<?> updateOrder(@RequestBody Order newOrder,@PathVariable String productName){
         try{
-            orderService.updateOrder(newOrder,productName);
-            return new ResponseEntity<>(HttpStatus.OK);
+            boolean orderUpdated = orderService.updateOrder(newOrder, productName);
+            if(orderUpdated==true)
+            {
+                log.info("Order created succesfully");
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            log.info("order not found with product name "+ productName);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.error("Unable to update the order of productName: "+productName);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

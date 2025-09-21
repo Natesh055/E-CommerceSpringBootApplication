@@ -3,6 +3,7 @@ package com.nateshECommerce.EcommerceApp.entity;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
@@ -22,6 +23,7 @@ public class Order {
     @Id
     private ObjectId orderId;
     @Nonnull
+    @Indexed(unique = true)
     private String productName;
     private LocalDateTime orderDate;
     private Double price;
