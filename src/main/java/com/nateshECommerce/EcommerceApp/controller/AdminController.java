@@ -8,139 +8,108 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-@Component
+@CrossOrigin(origins = "http://localhost:5173") // React default port
 @RestController
 @RequestMapping("/admin")
 @Slf4j
 public class AdminController {
-    @Autowired
-    OrderService orderService;
-    @Autowired
-    UserService userService;
 
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private UserService userService;
+
+    // ✅ Get all users
     @GetMapping("/all-users")
-    public ResponseEntity<?> getAllUsers() {
-        try {
-            List<User> allUsers = userService.getAllUsers();
-            if (allUsers == null || allUsers.isEmpty()) {
-                log.error("Unable to find users in the database");
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            log.info("Entries found for users");
-            return new ResponseEntity<>(allUsers, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to establish connection with database");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> allUsers = userService.getAllUsers();
+        if (allUsers == null || allUsers.isEmpty()) {
+            log.warn("No users found in the database");
+            return ResponseEntity.noContent().build();
         }
+        log.info("Retrieved {} users", allUsers.size());
+        return ResponseEntity.ok(allUsers);
     }
 
+    // ✅ Get all items
     @GetMapping("/all-items")
-    public ResponseEntity<?> getAllItems() {
-        try {
-            List<Order> allItems = orderService.getAllOrders();
-            if (allItems == null || allItems.isEmpty()) {
-                log.error("Unable to find items in the database");
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            log.info("Entries found for items");
-            return new ResponseEntity<>(allItems, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to establish connection with database");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<List<Order>> getAllItems() {
+        List<Order> allItems = orderService.getAllOrders();
+        if (allItems == null || allItems.isEmpty()) {
+            log.warn("No items found in the database");
+            return ResponseEntity.noContent().build();
         }
+        log.info("Retrieved {} items", allItems.size());
+        return ResponseEntity.ok(allItems);
     }
 
+    // ✅ Add item
     @PostMapping("/add-item")
-    public ResponseEntity<?> addItem(@RequestBody Order newOrder) {
-        try {
-            orderService.AddItem(newOrder);
-            return new ResponseEntity<>(newOrder, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to create the order");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Order> addItem(@RequestBody Order newOrder) {
+        orderService.AddItem(newOrder); // fixed naming
+        log.info("Item added: {}", newOrder.getProductName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(newOrder);
     }
 
+    // ✅ Add admin
     @PostMapping("/add-admin")
-    public ResponseEntity<?> addAdmin(@RequestBody User user) {
-        try {
-            userService.createAdmin(user);
-            log.info("Succesfully created admin with email" + user.getEmail());
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to create the Admin with email" + user.getEmail());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<User> addAdmin(@RequestBody User user) {
+        userService.createAdmin(user);
+        log.info("Admin created with email: {}", user.getEmail());
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
+    // ✅ Update item
     @PutMapping("/update-item/{productName}")
-    public ResponseEntity<?> updateItem(@RequestBody Order newOrder, @PathVariable String productName) {
-        try {
-            boolean orderUpdated = orderService.updateItem(newOrder, productName);
-            if (orderUpdated == true) {
-                log.info("Order created succesfully");
-                return new ResponseEntity<>(newOrder, HttpStatus.OK);
-            }
-            log.info("order not found with product name " + productName);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            log.error("Unable to update the order of productName: " + productName);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Order> updateItem(@RequestBody Order newOrder, @PathVariable String productName) {
+        boolean updated = orderService.updateItem(newOrder, productName);
+        if (updated) {
+            log.info("Item updated: {}", productName);
+            return ResponseEntity.ok(newOrder);
         }
+        log.warn("Item not found for update: {}", productName);
+        return ResponseEntity.notFound().build();
     }
 
+    // ✅ Get user by email
     @GetMapping("/email/{userMail}")
-    public ResponseEntity<?> getUserByEmail(@PathVariable String userMail) {
-        try {
-            User user = userService.findByEmail(userMail);
-            if (user == null) {
-                log.error("Unable to find user in the database");
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            log.info("Entries found for the user with email: " + userMail);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to establish connection with database");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<User> getUserByEmail(@PathVariable String userMail) {
+        User user = userService.findByEmail(userMail);
+        if (user == null) {
+            log.warn("User not found with email: {}", userMail);
+            return ResponseEntity.noContent().build();
         }
+        log.info("User retrieved with email: {}", userMail);
+        return ResponseEntity.ok(user);
     }
 
+    // ✅ Delete item
     @DeleteMapping("/item/{itemName}")
-    public ResponseEntity<?> deleteItem(@PathVariable String itemName) {
-        try {
-            Order itemByName = orderService.getItemByName(itemName);
-            if (itemByName == null) {
-                log.warn("No item found with name" + itemName);
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            orderService.deleteItem(itemByName);
-            log.info("Item deleted succesfully with name" + itemName);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to delete the item with itemName " + itemName);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Void> deleteItem(@PathVariable String itemName) {
+        Order item = orderService.getItemByName(itemName);
+        if (item == null) {
+            log.warn("No item found with name: {}", itemName);
+            return ResponseEntity.noContent().build();
         }
+        orderService.deleteItem(item);
+        log.info("Item deleted: {}", itemName);
+        return ResponseEntity.ok().build();
     }
 
+    // ✅ Delete user
     @DeleteMapping("/user/{userMail}")
-    public ResponseEntity<?> deleteUser(@PathVariable String userMail) {
-        try {
-            User user = userService.findByEmail(userMail);
-            if (user == null) {
-                log.warn("No user found with email" + userMail);
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            userService.deleteUser(user);
-            log.info("User deleted succesfully with name" + user);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to delete the item with itemName " + userMail);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Void> deleteUser(@PathVariable String userMail) {
+        User user = userService.findByEmail(userMail);
+        if (user == null) {
+            log.warn("No user found with email: {}", userMail);
+            return ResponseEntity.noContent().build();
         }
+        userService.deleteUser(user);
+        log.info("User deleted with email: {}", userMail);
+        return ResponseEntity.ok().build();
     }
 }
