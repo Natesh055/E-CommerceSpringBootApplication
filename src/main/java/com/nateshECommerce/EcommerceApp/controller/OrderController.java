@@ -24,7 +24,7 @@ public class OrderController {
 
 
     @PostMapping("/email/{userMail}")
-    public ResponseEntity<?> createOrder(@RequestBody Order newOrder, @PathVariable String userMail){
+    public ResponseEntity<?> addOrderToUser(@RequestBody Order newOrder, @PathVariable String userMail){
         try{
             orderService.saveOrder(newOrder,userMail);
             log.info("Order create succesfully");

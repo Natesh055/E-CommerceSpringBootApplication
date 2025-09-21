@@ -23,7 +23,25 @@ public class OrderService {
         Order saved = orderRepository.save(newOrder);
         user.getOrders().add(saved);
         userService.createUser(user);
+    }
 
+    public void AddItem(Order newOrder) {
+        newOrder.setOrderDate(LocalDateTime.now());
+        orderRepository.save(newOrder);
+    }
 
+    public void updateOrder(Order newOrder, String productName) {
+        Order existingOrder = orderRepository.getByProductName(productName);
+        if (existingOrder != null) {
+            existingOrder.setProductName(newOrder.getProductName()!=null && !newOrder.getProductName().equals("")?
+                    newOrder.getProductName() : existingOrder.getProductName());
+
+            existingOrder.setExistingQuantity(newOrder.getPrice()!=null && newOrder.getExistingQuantity()!=0?
+                    newOrder.getExistingQuantity() : existingOrder.getExistingQuantity());
+
+            existingOrder.setPrice(newOrder.getPrice()!=null && !newOrder.getPrice().equals("")?
+                    newOrder.getPrice() : existingOrder.getPrice());
+            orderRepository.save(existingOrder);
+        }
     }
 }

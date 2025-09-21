@@ -7,8 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
+
 
 import java.time.LocalDateTime;
 @Component
@@ -23,4 +25,6 @@ public class Order {
     private String productName;
     private LocalDateTime orderDate;
     private Double price;
+    @Nonnull
+    private Double existingQuantity;
 }

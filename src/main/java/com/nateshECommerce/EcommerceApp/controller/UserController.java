@@ -17,23 +17,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping
-    public ResponseEntity<?> getAllUsers()
-    {
-        try {
-            List<User> allUsers =  userService.getAllUsers();
-            if(allUsers == null || allUsers.isEmpty())
-            {
-                log.error("Unable to find users in the database" );
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            log.info("Entries found for users");
-            return new ResponseEntity<>(allUsers,HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to establish connection with database");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+
 
     @PostMapping
     public ResponseEntity<?>createUser(@RequestBody User user)
