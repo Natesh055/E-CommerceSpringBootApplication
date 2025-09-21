@@ -30,5 +30,5 @@ public class User {
     @Indexed(unique = true)
     private String email;
     @DBRef
-    private List<Orders> orders = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 }
