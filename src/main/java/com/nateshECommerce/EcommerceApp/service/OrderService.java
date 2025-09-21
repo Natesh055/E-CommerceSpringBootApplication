@@ -5,6 +5,7 @@ import com.nateshECommerce.EcommerceApp.entity.User;
 import com.nateshECommerce.EcommerceApp.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,13 +44,17 @@ public class OrderService {
     {
         return orderRepository.findAll();
     }
+    public Order getItemByName(String itemName)
+    {
+        return orderRepository.getByProductName(itemName);
+    }
 
     public void AddItem(Order newOrder) {
         newOrder.setOrderDate(LocalDateTime.now());
         orderRepository.save(newOrder);
     }
 
-    public boolean updateOrder(Order newOrder, String productName) {
+    public boolean updateItem(Order newOrder, String productName) {
         Order existingOrder = orderRepository.getByProductName(productName);
         if (existingOrder != null) {
             existingOrder.setProductName(newOrder.getProductName()!=null && !newOrder.getProductName().equals("")?
@@ -64,5 +69,10 @@ public class OrderService {
             return true;
         }
         return false;
+    }
+
+    public void deleteItem(Order order)
+    {
+        orderRepository.delete(order);
     }
 }

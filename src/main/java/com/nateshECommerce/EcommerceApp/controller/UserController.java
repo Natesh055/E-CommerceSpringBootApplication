@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,26 +22,11 @@ public class UserController {
     @Autowired
     OrderService orderService;
 
-
-    @PostMapping
-    public ResponseEntity<?>createUser(@RequestBody User user)
-    {
-        String email = user.getEmail();
-        try {
-            User isExistingUser = userService.findByEmail(email);
-            if (isExistingUser == null) {
-                //create the user
-                userService.createUser(user);
-                log.info("User created succesfully for user email "+ email );
-                return new ResponseEntity<>("User created succesfully for email " + email, HttpStatus.OK);
-            }
-            log.error("Duplicate email id found for the user with email "+ email );
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        } catch (Exception e) {
-            log.error("Unable to save the user in the database with email "+ email );
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @GetMapping("email/{userMail}")
+//    public ResponseEntity<?> getOrdersByEmail(@PathVariable String userMail)
+//    {
+//        List<Order> allOrders = userService.getAllOrders(userMail);
+//    }
 
     @PutMapping
     public ResponseEntity<?>updateUser(@RequestBody User newUser)
@@ -51,12 +35,12 @@ public class UserController {
         try {
             User existingUser = userService.findByEmail(email);
             if (existingUser != null) {
-                existingUser.setUserName(newUser.getUserName()!=null && !newUser.getEmail().equals("")
-                ?newUser.getUserName(): existingUser.getUserName());
-                existingUser.setPassword(newUser.getPassword()!=null && !newUser.getPassword().equals("")
-                        ?newUser.getPassword(): existingUser.getPassword());
-                existingUser.setEmail(newUser.getEmail()!=null && !newUser.getEmail().equals("")
-                        ?newUser.getEmail(): existingUser.getEmail());
+                existingUser.setUserName(newUser.getUserName()!=null && !newUser.getUserName().isEmpty()
+                        ? newUser.getUserName() : existingUser.getUserName());
+                existingUser.setPassword(newUser.getPassword()!=null && !newUser.getPassword().isEmpty()
+                        ? newUser.getPassword() : existingUser.getPassword());
+                existingUser.setEmail(newUser.getEmail()!=null && !newUser.getEmail().isEmpty()
+                        ? newUser.getEmail() : existingUser.getEmail());
                 userService.createUser(existingUser);
                 log.error("user updated succesfully with emailId: "+ email );
                 return new ResponseEntity<>(existingUser,HttpStatus.OK);
@@ -69,26 +53,8 @@ public class UserController {
         }
     }
 
-    @GetMapping("/email/{userMail}")
-    public ResponseEntity<?> getUserByEmail(@PathVariable String userMail)
-    {
-        try {
-            User user = userService.findByEmail(userMail);
-            if(user == null)
-            {
-                log.error("Unable to find user in the database");
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-            log.info("Entries found for the user with email: "+userMail);
-            return new ResponseEntity<>(user,HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Unable to establish connection with database");
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @PostMapping("/email/{userMail}/{productName}")
-    public ResponseEntity<?> addOrderToUser(@PathVariable String productName, @PathVariable String userMail) {
+    public ResponseEntity<?> addOrderToUser(@PathVariable String userMail, @PathVariable String productName){
         try {
             boolean isSaved = orderService.saveOrderToUser(productName, userMail);
             if (!isSaved) {

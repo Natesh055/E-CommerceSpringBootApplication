@@ -6,8 +6,10 @@ import com.nateshECommerce.EcommerceApp.repository.OrderRepository;
 import com.nateshECommerce.EcommerceApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -18,6 +20,9 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public User findByEmail(String email)
     {
         return userRepository.findByEmail(email);
@@ -25,6 +30,14 @@ public class UserService {
 
     public void createUser(User user)
     {
+        user.setRoles(Arrays.asList("USER"));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+    }
+    public void createAdmin(User user)
+    {
+        user.setRoles(Arrays.asList("ADMIN","USER"));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
     public List<User> getAllUsers()
@@ -37,5 +50,10 @@ public class UserService {
         Order saved = orderRepository.save(newOrder);
         user.getOrders().add(saved);
         userRepository.save(user);
+    }
+
+    public void deleteUser(User user)
+    {
+        userRepository.delete(user);
     }
 }

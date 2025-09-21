@@ -31,4 +31,5 @@ public class User {
     private String email;
     @DBRef
     private List<Order> orders = new ArrayList<>();
+    private List<String>roles = new ArrayList<>();
 }
