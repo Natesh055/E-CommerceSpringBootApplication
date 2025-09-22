@@ -51,7 +51,10 @@ public class UserService {
         user.getOrders().add(saved);
         userRepository.save(user);
     }
-
+//    public List<Order> getAllOrdersByUser(User user)
+//    {
+//        return orderRepository.
+//    }
     public void deleteUser(User user)
     {
         userRepository.delete(user);

@@ -28,5 +28,7 @@ public class Order {
     private LocalDateTime orderDate;
     private Double price;
     @Nonnull
+    private String category;
+    @Nonnull
     private Double existingQuantity;
 }
