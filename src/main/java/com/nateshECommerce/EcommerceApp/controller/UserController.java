@@ -1,6 +1,5 @@
 package com.nateshECommerce.EcommerceApp.controller;
 
-import com.nateshECommerce.EcommerceApp.entity.Order;
 import com.nateshECommerce.EcommerceApp.entity.User;
 import com.nateshECommerce.EcommerceApp.service.OrderService;
 import com.nateshECommerce.EcommerceApp.service.UserService;
@@ -11,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -67,7 +64,7 @@ public class UserController {
             User user = userService.findByEmail(email);
 
             log.info("Successfully retrieved user with email: {}", email);
-            return new ResponseEntity<>(user.getOrders(), HttpStatus.OK);
+            return new ResponseEntity<>(user.getProducts(), HttpStatus.OK);
         } catch (SecurityException se) {
             log.error("Security error: {}", se.getMessage());
             throw se; // Rethrow or return a custom error response
@@ -99,7 +96,6 @@ public class UserController {
                 // Update user fields only if new values are provided
                 existingUser.setUserName(newUser.getUserName() != null && !newUser.getUserName().isEmpty() ? newUser.getUserName() : existingUser.getUserName());
                 existingUser.setPassword(newUser.getPassword() != null && !newUser.getPassword().isEmpty() ? newUser.getPassword() : existingUser.getPassword());
-                existingUser.setEmail(newUser.getEmail() != null && !newUser.getEmail().isEmpty() ? newUser.getEmail() : existingUser.getEmail());
 
                 // Save the updated user
                 userService.createUser(existingUser);

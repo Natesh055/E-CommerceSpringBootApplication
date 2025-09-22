@@ -1,6 +1,6 @@
 package com.nateshECommerce.EcommerceApp.service;
 
-import com.nateshECommerce.EcommerceApp.entity.Order;
+import com.nateshECommerce.EcommerceApp.entity.Product;
 import com.nateshECommerce.EcommerceApp.entity.User;
 import com.nateshECommerce.EcommerceApp.repository.OrderRepository;
 import com.nateshECommerce.EcommerceApp.repository.UserRepository;
@@ -48,11 +48,11 @@ public class UserService {
     {
         return userRepository.findAll();
     }
-    public void saveOrder(Order newOrder, String userMail) {
+    public void saveOrder(Product newProduct, String userMail) {
         User user = userRepository.findByEmail(userMail);
-        newOrder.setOrderDate(LocalDateTime.now());
-        Order saved = orderRepository.save(newOrder);
-        user.getOrders().add(saved);
+        newProduct.setOrderDate(LocalDateTime.now());
+        Product saved = orderRepository.save(newProduct);
+        user.getProducts().add(saved);
         userRepository.save(user);
     }
 //    public List<Order> getAllOrdersByUser(User user)

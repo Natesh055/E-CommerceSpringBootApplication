@@ -1,6 +1,6 @@
 package com.nateshECommerce.EcommerceApp.controller;
 
-import com.nateshECommerce.EcommerceApp.entity.Order;
+import com.nateshECommerce.EcommerceApp.entity.Product;
 import com.nateshECommerce.EcommerceApp.entity.User;
 import com.nateshECommerce.EcommerceApp.service.OrderService;
 import com.nateshECommerce.EcommerceApp.service.UserService;
@@ -37,8 +37,8 @@ public class AdminController {
 
     // ✅ Get all items
     @GetMapping("/all-items")
-    public ResponseEntity<List<Order>> getAllItems() {
-        List<Order> allItems = orderService.getAllOrders();
+    public ResponseEntity<List<Product>> getAllItems() {
+        List<Product> allItems = orderService.getAllOrders();
         if (allItems == null || allItems.isEmpty()) {
             log.warn("No items found in the database");
             return ResponseEntity.noContent().build();
@@ -49,10 +49,10 @@ public class AdminController {
 
     // ✅ Add item
     @PostMapping("/add-item")
-    public ResponseEntity<Order> addItem(@RequestBody Order newOrder) {
-        orderService.AddItem(newOrder); // fixed naming
-        log.info("Item added: {}", newOrder.getProductName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(newOrder);
+    public ResponseEntity<Product> addItem(@RequestBody Product newProduct) {
+        orderService.AddItem(newProduct); // fixed naming
+        log.info("Item added: {}", newProduct.getProductName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(newProduct);
     }
 
     // ✅ Add admin
@@ -65,11 +65,11 @@ public class AdminController {
 
     // ✅ Update item
     @PutMapping("/update-item/{productName}")
-    public ResponseEntity<Order> updateItem(@RequestBody Order newOrder, @PathVariable String productName) {
-        boolean updated = orderService.updateItem(newOrder, productName);
+    public ResponseEntity<Product> updateItem(@RequestBody Product newProduct, @PathVariable String productName) {
+        boolean updated = orderService.updateItem(newProduct, productName);
         if (updated) {
             log.info("Item updated: {}", productName);
-            return ResponseEntity.ok(newOrder);
+            return ResponseEntity.ok(newProduct);
         }
         log.warn("Item not found for update: {}", productName);
         return ResponseEntity.notFound().build();
@@ -90,7 +90,7 @@ public class AdminController {
     // ✅ Delete item
     @DeleteMapping("/item/{itemName}")
     public ResponseEntity<Void> deleteItem(@PathVariable String itemName) {
-        Order item = orderService.getItemByName(itemName);
+        Product item = orderService.getItemByName(itemName);
         if (item == null) {
             log.warn("No item found with name: {}", itemName);
             return ResponseEntity.noContent().build();

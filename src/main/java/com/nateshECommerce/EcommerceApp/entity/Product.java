@@ -3,7 +3,6 @@ package com.nateshECommerce.EcommerceApp.entity;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class Order {
+public class Product {
     @Id
     private ObjectId orderId;
     @Nonnull

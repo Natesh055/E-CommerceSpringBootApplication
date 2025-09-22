@@ -1,13 +1,11 @@
 package com.nateshECommerce.EcommerceApp.service;
 
-import com.nateshECommerce.EcommerceApp.entity.Order;
+import com.nateshECommerce.EcommerceApp.entity.Product;
 import com.nateshECommerce.EcommerceApp.entity.User;
 import com.nateshECommerce.EcommerceApp.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,14 +24,14 @@ public boolean saveOrderToUser(String productName, String userMail) {
     if(user == null) {
         return false; // user not found
     }
-    Order newOrder = orderRepository.getByProductName(productName);
-    newOrder.setOrderDate(LocalDateTime.now());
-    Order saved = orderRepository.save(newOrder);
+    Product newProduct = orderRepository.getByProductName(productName);
+    newProduct.setOrderDate(LocalDateTime.now());
+    Product saved = orderRepository.save(newProduct);
     if (saved.getExistingQuantity() > 0) {
         saved.setExistingQuantity(saved.getExistingQuantity() - 1);
         orderRepository.save(saved);
 
-        user.getOrders().add(saved);
+        user.getProducts().add(saved);
         userService.updateUser(user);
         return true;
     }
@@ -41,39 +39,39 @@ public boolean saveOrderToUser(String productName, String userMail) {
 }
 
 
-    public List<Order> getAllOrders()
+    public List<Product> getAllOrders()
     {
         return orderRepository.findAll();
     }
-    public Order getItemByName(String itemName)
+    public Product getItemByName(String itemName)
     {
         return orderRepository.getByProductName(itemName);
     }
 
-    public void AddItem(Order newOrder) {
-        newOrder.setOrderDate(LocalDateTime.now());
-        orderRepository.save(newOrder);
+    public void AddItem(Product newProduct) {
+        newProduct.setOrderDate(LocalDateTime.now());
+        orderRepository.save(newProduct);
     }
 
-    public boolean updateItem(Order newOrder, String productName) {
-        Order existingOrder = orderRepository.getByProductName(productName);
-        if (existingOrder != null) {
-            existingOrder.setProductName(newOrder.getProductName()!=null && !newOrder.getProductName().equals("")?
-                    newOrder.getProductName() : existingOrder.getProductName());
+    public boolean updateItem(Product newProduct, String productName) {
+        Product existingProduct = orderRepository.getByProductName(productName);
+        if (existingProduct != null) {
+            existingProduct.setProductName(newProduct.getProductName()!=null && !newProduct.getProductName().equals("")?
+                    newProduct.getProductName() : existingProduct.getProductName());
 
-            existingOrder.setExistingQuantity(newOrder.getExistingQuantity()!=null && newOrder.getExistingQuantity()!=0?
-                    newOrder.getExistingQuantity() : existingOrder.getExistingQuantity());
+            existingProduct.setExistingQuantity(newProduct.getExistingQuantity()!=null && newProduct.getExistingQuantity()!=0?
+                    newProduct.getExistingQuantity() : existingProduct.getExistingQuantity());
 
-            existingOrder.setPrice(newOrder.getPrice()!=null && !newOrder.getPrice().equals("")?
-                    newOrder.getPrice() : existingOrder.getPrice());
-            orderRepository.save(existingOrder);
+            existingProduct.setPrice(newProduct.getPrice()!=null && !newProduct.getPrice().equals("")?
+                    newProduct.getPrice() : existingProduct.getPrice());
+            orderRepository.save(existingProduct);
             return true;
         }
         return false;
     }
 
-    public void deleteItem(Order order)
+    public void deleteItem(Product product)
     {
-        orderRepository.delete(order);
+        orderRepository.delete(product);
     }
 }

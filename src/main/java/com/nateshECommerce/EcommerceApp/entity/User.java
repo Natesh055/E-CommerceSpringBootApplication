@@ -30,6 +30,6 @@ public class User {
     @Indexed(unique = true)
     private String email;
     @DBRef
-    private List<Order> orders = new ArrayList<>();
+    private List<Product> products = new ArrayList<>();
     private List<String>roles = new ArrayList<>();
 }
