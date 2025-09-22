@@ -21,24 +21,25 @@ public class OrderService {
     UserService userService;
 
 //    @Transactional
-    public boolean saveOrderToUser(String productName, String userMail) {
-        User user = userService.findByEmail(userMail);
-        if(user == null) {
-            return false; // user not found
-        }
-        Order newOrder = orderRepository.getByProductName(productName);
-        newOrder.setOrderDate(LocalDateTime.now());
-        Order saved = orderRepository.save(newOrder);
-        if (saved.getExistingQuantity() > 0) {
-            saved.setExistingQuantity(saved.getExistingQuantity() - 1);
-            orderRepository.save(saved);
-
-            user.getOrders().add(saved);
-            userService.createUser(user); // make sure this updates existing user
-            return true;
-        }
-        return false; // no quantity available
+public boolean saveOrderToUser(String productName, String userMail) {
+    User user = userService.findByEmail(userMail);
+    if(user == null) {
+        return false; // user not found
     }
+    Order newOrder = orderRepository.getByProductName(productName);
+    newOrder.setOrderDate(LocalDateTime.now());
+    Order saved = orderRepository.save(newOrder);
+    if (saved.getExistingQuantity() > 0) {
+        saved.setExistingQuantity(saved.getExistingQuantity() - 1);
+        orderRepository.save(saved);
+
+        user.getOrders().add(saved);
+        userService.updateUser(user);
+        return true;
+    }
+    return false; // no quantity available
+}
+
 
     public List<Order> getAllOrders()
     {
